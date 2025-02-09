@@ -1,0 +1,10 @@
+TencentCDN:
+  CDNDomain: "https://cdn.example.com"
+  Region: "ap-shanghai"
+  Bucket: "example-1300000000"
+  SecretID: "AKIDxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+  SecretKey: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+  Tenants:
+    - RootPath: "app-a"
+      AppID: "app-a"
+      AppKey: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
