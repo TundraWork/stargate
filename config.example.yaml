@@ -1,10 +1,15 @@
-TencentCDN:
-  CDNDomain: "https://cdn.example.com"
-  Region: "ap-shanghai"
-  Bucket: "example-1300000000"
-  SecretID: "AKIDxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-  SecretKey: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-  Tenants:
-    - RootPath: "app-a"
-      AppID: "app-a"
-      AppKey: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+ListenPort: 8080
+Service:
+  RailgunCDN:
+    COS:
+      Region: "ap-shanghai"
+      Bucket: "example-1300000000"
+      SecretID: "AKIDxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      SecretKey: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    CDN:
+      Domain: "https://cdn.example.com"
+      PKey: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    Tenants:
+      - RootPath: "app-a"
+        AppID: "app-a"
+        AppKey: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"

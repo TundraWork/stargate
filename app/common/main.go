@@ -1,10 +1,9 @@
-package handler
+package common
 
 import (
 	"context"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	"github.com/hertz-contrib/requestid"
-	"github.com/tundrawork/stargate/app/common/service"
 	"time"
 
 	"github.com/cloudwego/hertz/pkg/app"
@@ -19,7 +18,7 @@ type PingResponseData struct {
 func Ping(ctx context.Context, c *app.RequestContext) {
 	timestamp := time.Now().Unix()
 	requestId := requestid.Get(c)
-	c.JSON(consts.StatusOK, service.APIResponseSuccess(PingResponseData{
+	c.JSON(consts.StatusOK, APIResponseSuccess(PingResponseData{
 		Timestamp: timestamp,
 		RequestId: requestId,
 	}))

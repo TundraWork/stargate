@@ -19,19 +19,28 @@ type Config struct {
 }
 
 type Services struct {
-	TencentCDN TencentCDN `yaml:"TencentCDN"`
+	RailgunCDN RailgunCDN `yaml:"RailgunCDN"`
+}
+
+type RailgunCDN struct {
+	COS     TencentCOS         `yaml:"COS"`
+	CDN     TencentCDN         `yaml:"CDN"`
+	Tenants []RailgunCDNTenant `yaml:"Tenants"`
+}
+
+type TencentCOS struct {
+	Region    string `yaml:"Region"`
+	Bucket    string `yaml:"Bucket"`
+	SecretID  string `yaml:"SecretID"`
+	SecretKey string `yaml:"SecretKey"`
 }
 
 type TencentCDN struct {
-	CDNDomain string             `yaml:"CDNDomain"`
-	Region    string             `yaml:"Region"`
-	Bucket    string             `yaml:"Bucket"`
-	SecretID  string             `yaml:"SecretID"`
-	SecretKey string             `yaml:"SecretKey"`
-	Tenants   []TencentCDNTenant `yaml:"Tenants"`
+	Domain string `yaml:"Domain"`
+	PKey   string `yaml:"PKey"`
 }
 
-type TencentCDNTenant struct {
+type RailgunCDNTenant struct {
 	RootPath string `yaml:"RootPath"`
 	AppID    string `yaml:"AppID"`
 	AppKey   string `yaml:"AppKey"`
