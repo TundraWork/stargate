@@ -12,6 +12,7 @@ func apiRouteRegister(r *server.Hertz) {
 	common_.GET("/ping", common.Ping)
 
 	railgun_ := r.Group("/railgun/v1")
-	railgun_.POST("/put", railgun_cdn.Put)
-	railgun_.GET("/get-url", railgun_cdn.GetURL)
+	railgun_.PUT("/object", railgun_cdn.Put)
+	railgun_.DELETE("/object", railgun_cdn.Delete)
+	railgun_.GET("/object", railgun_cdn.GetURL)
 }
