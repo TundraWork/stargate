@@ -3,7 +3,7 @@ package router
 import (
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/tundrawork/stargate/app/common"
-	railgun_cdn "github.com/tundrawork/stargate/app/railgun-cdn"
+	railgunCDN "github.com/tundrawork/stargate/app/railgun-cdn"
 )
 
 // apiRouteRegister registers all API routes.
@@ -12,7 +12,7 @@ func apiRouteRegister(r *server.Hertz) {
 	common_.GET("/ping", common.Ping)
 
 	railgun_ := r.Group("/railgun/v1")
-	railgun_.PUT("/object", railgun_cdn.Put)
-	railgun_.DELETE("/object", railgun_cdn.Delete)
-	railgun_.GET("/object", railgun_cdn.GetURL)
+	railgun_.PUT("/object", railgunCDN.Put)
+	railgun_.DELETE("/object", railgunCDN.Delete)
+	railgun_.GET("/object", railgunCDN.GetURL)
 }
