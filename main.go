@@ -14,6 +14,7 @@ func main() {
 	h := server.Default(
 		server.WithHostPorts(":"+config.Conf.ListenPort),
 		server.WithHandleMethodNotAllowed(true),
+		server.WithStreamBody(true),
 		server.WithMaxRequestBodySize(config.Conf.MaxRequestBodySize),
 	)
 	h.Use(
