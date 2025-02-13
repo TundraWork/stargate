@@ -76,7 +76,7 @@ func GetURL(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusBadRequest, common.APIResponseError(consts.StatusBadRequest, "invalid object path"))
 		return
 	}
-	objectKey := rootPath + tenantRequest.ObjectPath
+	objectKey := "/" + rootPath + tenantRequest.ObjectPath
 	url, expires, err := api.GetObjectPublicURL(objectKey, tenantRequest.TTL)
 	if err != nil {
 		c.JSON(consts.StatusInternalServerError, common.APIResponseError(consts.StatusInternalServerError, err.Error()))
