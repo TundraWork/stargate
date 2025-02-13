@@ -29,16 +29,16 @@ func (req *CommonTenantRequest) FromRequestContext(c *app.RequestContext) error 
 	if !isValidObjectPath(string(objectPath)) {
 		return errors.New("invalid object path")
 	}
-	ttlStr := string(c.GetHeader("X-URL-TTL"))
+	ttlStr := string(c.GetHeader("X-TTL"))
 	var ttl int64
 	var err error
 	if len(ttlStr) > 0 {
 		ttl, err = strconv.ParseInt(ttlStr, 10, 64)
 		if err != nil {
-			return errors.New("invalid X-URL-TTL value")
+			return errors.New("invalid X-TTL value")
 		}
 		if ttl <= 0 {
-			return errors.New("X-URL-TTL value must be greater than 0")
+			return errors.New("X-TTL value must be greater than 0")
 		}
 	}
 
