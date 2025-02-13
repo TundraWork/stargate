@@ -1,6 +1,6 @@
 ListenPort: 8080
 MaxRequestBodySize: 100000000
-Service:
+Services:
   RailgunCDN:
     COS:
       Region: "ap-shanghai"
