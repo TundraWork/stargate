@@ -57,3 +57,9 @@ func PutObject(ctx context.Context, objectKey string, dataStream io.Reader, cont
 	_, err := cosClient.Object.Put(ctx, objectKey, dataStream, opt)
 	return err
 }
+
+// DeleteObject deletes an object from COS.
+func DeleteObject(ctx context.Context, objectKey string) error {
+	_, err := cosClient.Object.Delete(ctx, objectKey)
+	return err
+}

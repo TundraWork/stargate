@@ -40,6 +40,26 @@ func Put(ctx context.Context, c *app.RequestContext) {
 	c.JSON(consts.StatusOK, common.APIResponseSuccess(nil))
 }
 
+// Delete deletes an object.
+func Delete(ctx context.Context, c *app.RequestContext) {
+	tenantRequest := &CommonTenantRequest{}
+	if err := tenantRequest.FromRequestContext(c); err != nil {
+		c.JSON(consts.StatusBadRequest, common.APIResponseError(consts.StatusBadRequest, err.Error()))
+		return
+	}
+	rootPath, err := authTenant(tenantRequest)
+	if err != nil {
+		c.JSON(consts.StatusUnauthorized, common.APIResponseError(consts.StatusUnauthorized, err.Error()))
+		return
+	}
+	objectKey := rootPath + tenantRequest.ObjectPath
+	if err := api.DeleteObject(ctx, objectKey); err != nil {
+		c.JSON(consts.StatusInternalServerError, common.APIResponseError(consts.StatusInternalServerError, err.Error()))
+		return
+	}
+	c.JSON(consts.StatusOK, common.APIResponseSuccess(nil))
+}
+
 // GetURL returns the signed URL to access an object.
 func GetURL(ctx context.Context, c *app.RequestContext) {
 	tenantRequest := &CommonTenantRequest{}
