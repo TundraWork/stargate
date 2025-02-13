@@ -15,7 +15,9 @@ func GetObjectPublicURL(objectKey string, ttl int64) (publicURL string, expires 
 	if len(objectKey) == 0 || objectKey[len(objectKey)-1] == '/' {
 		return "", -1, fmt.Errorf("invalid object key")
 	}
-	timestamp := time.Now().Unix() + config.Conf.Services.RailgunCDN.CDN.TimestampOffset + ttl
+
+	expires = time.Now().Unix() + ttl
+	timestamp := expires + config.Conf.Services.RailgunCDN.CDN.TimestampOffset
 	hashable := fmt.Sprintf("%s%s%d", config.Conf.Services.RailgunCDN.CDN.PKey, objectKey, timestamp)
 	sign := fmt.Sprintf("%x", md5.Sum([]byte(hashable)))
 
@@ -25,5 +27,6 @@ func GetObjectPublicURL(objectKey string, ttl int64) (publicURL string, expires 
 		sign,
 		timestamp,
 	)
-	return publicURL, timestamp, nil
+
+	return publicURL, expires, nil
 }
