@@ -26,6 +26,9 @@ func (req *CommonTenantRequest) FromRequestContext(c *app.RequestContext) error 
 	if len(appID) == 0 || len(appKey) == 0 || len(objectPath) == 0 {
 		return errors.New("missing common tenant request fields")
 	}
+	if !isValidObjectPath(string(objectPath)) {
+		return errors.New("invalid object path")
+	}
 	ttlStr := string(c.GetHeader("X-URL-TTL"))
 	var ttl int64
 	var err error
