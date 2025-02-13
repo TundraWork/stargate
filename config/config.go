@@ -36,8 +36,9 @@ type TencentCOS struct {
 }
 
 type TencentCDN struct {
-	Domain string `yaml:"Domain"`
-	PKey   string `yaml:"PKey"`
+	Domain          string `yaml:"Domain"`
+	PKey            string `yaml:"PKey"`
+	TimestampOffset int64  `yaml:"TimestampOffset"`
 }
 
 type RailgunCDNTenant struct {

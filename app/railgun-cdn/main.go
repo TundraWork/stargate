@@ -2,7 +2,6 @@ package railgun_cdn
 
 import (
 	"context"
-	"errors"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	"github.com/tundrawork/stargate/app/common"
@@ -22,43 +21,49 @@ func Init() {
 
 // Put uploads an object.
 func Put(ctx context.Context, c *app.RequestContext) {
-	tenantRequest, err := parseCommonTenantRequest(c)
-	if err != nil {
+	tenantRequest := &CommonTenantRequest{}
+	if err := tenantRequest.FromRequestContext(c); err != nil {
 		c.JSON(consts.StatusBadRequest, common.APIResponseError(consts.StatusBadRequest, err.Error()))
+		return
 	}
 	rootPath, err := authTenant(tenantRequest)
 	if err != nil {
 		c.JSON(consts.StatusUnauthorized, common.APIResponseError(consts.StatusUnauthorized, err.Error()))
+		return
 	}
 	objectKey := rootPath + tenantRequest.ObjectPath
 	contentType := string(c.GetHeader("Content-Type"))
-	if err := api.PutObject(ctx, objectKey, c.RequestBodyStream(), contentType); err != nil {
+	if err := api.PutObject(ctx, objectKey, c.RequestBodyStream(), contentType, tenantRequest.TTL); err != nil {
 		c.JSON(consts.StatusInternalServerError, common.APIResponseError(consts.StatusInternalServerError, err.Error()))
+		return
 	}
 	c.JSON(consts.StatusOK, common.APIResponseSuccess(nil))
 }
 
-// parseCommonTenantRequest parses the common request fields of a tenant.
-func parseCommonTenantRequest(c *app.RequestContext) (*CommonTenantRequest, error) {
-	appID := c.GetHeader("X-App-Id")
-	appKey := c.GetHeader("X-App-Key")
-	objectPath := c.GetHeader("X-Object-Path")
-	if len(appID) == 0 || len(appKey) == 0 || len(objectPath) == 0 {
-		return &CommonTenantRequest{}, errors.New("missing common tenant request fields")
+// GetURL returns the signed URL to access an object.
+func GetURL(ctx context.Context, c *app.RequestContext) {
+	tenantRequest := &CommonTenantRequest{}
+	if err := tenantRequest.FromRequestContext(c); err != nil {
+		c.JSON(consts.StatusBadRequest, common.APIResponseError(consts.StatusBadRequest, err.Error()))
+		return
 	}
-	return &CommonTenantRequest{
-		AppID:      string(appID),
-		AppKey:     string(appKey),
-		ObjectPath: string(objectPath),
-	}, nil
-}
-
-// authTenant authenticates the tenant from the common tenant request and returns the tenant's root path.
-func authTenant(req *CommonTenantRequest) (string, error) {
-	for _, tenant := range config.Conf.Services.RailgunCDN.Tenants {
-		if tenant.AppID == req.AppID && tenant.AppKey == req.AppKey {
-			return tenant.RootPath, nil
-		}
+	rootPath, err := authTenant(tenantRequest)
+	if err != nil {
+		c.JSON(consts.StatusUnauthorized, common.APIResponseError(consts.StatusUnauthorized, err.Error()))
+		return
 	}
-	return "", errors.New("cannot authorize tenant")
+	if !isValidObjectPath(tenantRequest.ObjectPath) {
+		c.JSON(consts.StatusBadRequest, common.APIResponseError(consts.StatusBadRequest, "invalid object path"))
+		return
+	}
+	objectKey := rootPath + tenantRequest.ObjectPath
+	url, expires, err := api.GetObjectPublicURL(objectKey, tenantRequest.TTL)
+	if err != nil {
+		c.JSON(consts.StatusInternalServerError, common.APIResponseError(consts.StatusInternalServerError, err.Error()))
+		return
+	}
+	c.JSON(consts.StatusOK, common.APIResponseSuccess(GetURLResponse{
+		URL:     url,
+		Expires: expires,
+	}))
 }

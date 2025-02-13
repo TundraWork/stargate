@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"time"
 )
 
 var (
@@ -36,14 +37,19 @@ func InitCosClient(bucket, region, secretID, secretKey string) {
 }
 
 // PutObject puts a streamable object to COS.
-func PutObject(ctx context.Context, objectKey string, dataStream io.Reader, contentType string) error {
+func PutObject(ctx context.Context, objectKey string, dataStream io.Reader, contentType string, ttl int64) error {
 	if contentType == "" {
 		contentType = "application/octet-stream"
 	}
+	headerOptions := &cos.ObjectPutHeaderOptions{
+		ContentType: contentType,
+	}
+	if ttl > 0 {
+		timestamp := time.Now().Unix() + ttl
+		headerOptions.Expires = time.Unix(timestamp, 0).Format(time.RFC1123)
+	}
 	opt := &cos.ObjectPutOptions{
-		ObjectPutHeaderOptions: &cos.ObjectPutHeaderOptions{
-			ContentType: contentType,
-		},
+		ObjectPutHeaderOptions: headerOptions,
 		ACLHeaderOptions: &cos.ACLHeaderOptions{
 			XCosACL: "private", // "private" | "public-read" | "public-read-write" | "authenticated-read"
 		},
