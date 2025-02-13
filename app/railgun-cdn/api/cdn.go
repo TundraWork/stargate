@@ -12,7 +12,7 @@ func GetObjectPublicURL(objectKey string, ttl int64) (publicURL string, expires 
 	if ttl <= 0 {
 		return "", -1, fmt.Errorf("ttl must be a positive integer")
 	}
-	if len(objectKey) == 0 || objectKey[0] != '/' || objectKey[len(objectKey)-1] == '/' {
+	if len(objectKey) == 0 || objectKey[len(objectKey)-1] == '/' {
 		return "", -1, fmt.Errorf("invalid object key")
 	}
 	timestamp := time.Now().Unix() + config.Conf.Services.RailgunCDN.CDN.TimestampOffset + ttl
