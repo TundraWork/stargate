@@ -14,8 +14,9 @@ var (
 )
 
 type Config struct {
-	ListenPort string   `yaml:"ListenPort"`
-	Services   Services `yaml:"Services"`
+	ListenPort         string   `yaml:"ListenPort"`
+	MaxRequestBodySize int      `yaml:"MaxRequestBodySize"`
+	Services           Services `yaml:"Services"`
 }
 
 type Services struct {
