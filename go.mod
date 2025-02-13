@@ -8,6 +8,7 @@ require (
 	github.com/knadh/koanf/parsers/yaml v0.1.0
 	github.com/knadh/koanf/providers/file v1.1.2
 	github.com/knadh/koanf/v2 v2.1.2
+	github.com/tencentyun/cos-go-sdk-v5 v0.7.61
 )
 
 require (
@@ -30,7 +31,6 @@ require (
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/mozillazg/go-httpheader v0.4.0 // indirect
 	github.com/nyaruka/phonenumbers v1.0.55 // indirect
-	github.com/tencentyun/cos-go-sdk-v5 v0.7.61 // indirect
 	github.com/tidwall/gjson v1.14.4 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.0 // indirect
