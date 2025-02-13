@@ -8,7 +8,7 @@ Services:
       SecretID: "AKIDxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
       SecretKey: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
     CDN:
-      Domain: "https://cdn.example.com"
+      Endpoint: "https://cdn.example.com"
       PKey: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
     Tenants:
       - RootPath: "app-a"

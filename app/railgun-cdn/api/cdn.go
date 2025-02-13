@@ -19,8 +19,8 @@ func GetObjectPublicURL(objectKey string, ttl int64) (publicURL string, expires 
 	hashable := fmt.Sprintf("%s%s%d", config.Conf.Services.RailgunCDN.CDN.PKey, objectKey, timestamp)
 	sign := fmt.Sprintf("%x", md5.Sum([]byte(hashable)))
 
-	publicURL = fmt.Sprintf("https://%s%s?sign=%s&t=%d",
-		config.Conf.Services.RailgunCDN.CDN.Domain,
+	publicURL = fmt.Sprintf("%s%s?sign=%s&t=%d",
+		config.Conf.Services.RailgunCDN.CDN.Endpoint,
 		objectKey,
 		sign,
 		timestamp,
