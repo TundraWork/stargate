@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Railgun CDN - Stargate</title>
+</head>
+
+<body>
+    <h1 id="railgun-cdn">Railgun CDN</h1>
+    <p>A simple CDN as a Service implementation with multiple tenants support.</p>
+    <hr>
+    <h2 id="interfaces">Interfaces</h2>
+    <p> <strong>PUT /railgun/v1/object</strong></p>
+    <p> Upload a new object.</p>
+    <blockquote>
+        <p><strong>Headers</strong></p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Key</th>
+                    <th>Value</th>
+                    <th>Required</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>X-App-Id</code></td>
+                    <td>string</td>
+                    <td>¡Ì</td>
+                    <td>Tenant's AppID</td>
+                </tr>
+                <tr>
+                    <td><code>X-App-Key</code></td>
+                    <td>string</td>
+                    <td>¡Ì</td>
+                    <td>Tenant's AppKey</td>
+                </tr>
+                <tr>
+                    <td><code>X-Object-Path</code></td>
+                    <td>string</td>
+                    <td>¡Ì</td>
+                    <td>Full path of the object. Must start with a "/" and not end with a "/".</td>
+                </tr>
+                <tr>
+                    <td><code>Content-Type</code></td>
+                    <td>string</td>
+                    <td>¡Á</td>
+                    <td>The MIME type of the object, as defined in <a
+                            href="https://datatracker.ietf.org/doc/html/rfc2046">RFC 2046</a>. If not present or an
+                        empty
+                        string ("") is provided, the server will force it to "application/octet-stream".
+                    </td>
+                </tr>
+                <tr>
+                    <td><code>X-TTL</code></td>
+                    <td>uint64</td>
+                    <td>¡Á</td>
+                    <td>The object's lifespan in seconds. The object will be deleted after this duration. Set to an
+                        empty string ("") for an infinite lifespan (no expiration).</td>
+                </tr>
+            </tbody>
+        </table>
+        <p><strong>Parameters</strong></p>
+        <p>No parameters.</p>
+        <p><strong>Body</strong></p>
+        <p>The byte stream (arbitrary binary data) of the object. If an empty body is provided, an empty object with the
+            specified path will be created.</p>
+    </blockquote>
+    <p> <strong>DELETE /railgun/v1/object</strong></p>
+    <p> Delete an existing object.</p>
+    <blockquote>
+        <p><strong>Headers</strong></p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Key</th>
+                    <th>Value</th>
+                    <th>Required</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>X-App-Id</code></td>
+                    <td>string</td>
+                    <td>¡Ì</td>
+                    <td>Tenant's AppID</td>
+                </tr>
+                <tr>
+                    <td><code>X-App-Key</code></td>
+                    <td>string</td>
+                    <td>¡Ì</td>
+                    <td>Tenant's AppKey</td>
+                </tr>
+                <tr>
+                    <td><code>X-Object-Path</code></td>
+                    <td>string</td>
+                    <td>¡Ì</td>
+                    <td>Full path of the object. Must start with a "/" and not end with a "/".</td>
+                </tr>
+            </tbody>
+        </table>
+        <p><strong>Parameters</strong></p>
+        <p>No parameters.</p>
+        <p><strong>Body</strong></p>
+        <p>No body.</p>
+    </blockquote>
+    <p> <strong>GET /railgun/v1/object</strong></p>
+    <p> Retrieve the public accessible URL of an object.</p>
+    <p> Note: This method does not ensure the object's existence. If used with an invalid path, it will return a URL
+        that will lead to a 404 error.</p>
+    <blockquote>
+        <p><strong>Headers</strong></p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Key</th>
+                    <th>Value</th>
+                    <th>Required</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>X-App-Id</code></td>
+                    <td>string</td>
+                    <td>¡Ì</td>
+                    <td>Tenant's AppID</td>
+                </tr>
+                <tr>
+                    <td><code>X-App-Key</code></td>
+                    <td>string</td>
+                    <td>¡Ì</td>
+                    <td>Tenant's AppKey</td>
+                </tr>
+                <tr>
+                    <td><code>X-Object-Path</code></td>
+                    <td>string</td>
+                    <td>¡Ì</td>
+                    <td>Full path of the object. Must start with a "/" and not end with a "/".</td>
+                </tr>
+                <tr>
+                    <td><code>X-TTL</code></td>
+                    <td>uint64</td>
+                    <td>¡Á</td>
+                    <td>The URL's lifespan in seconds. The URL will expire after this duration. Set to an empty string
+                        ("") for an infinite lifespan (no expiration).</td>
+                </tr>
+            </tbody>
+        </table>
+        <p><strong>Parameters</strong></p>
+        <p>No parameters.</p>
+        <p><strong>Body</strong></p>
+        <p>No body.</p>
+    </blockquote>
+</body>
+
+</html>

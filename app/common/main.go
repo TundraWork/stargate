@@ -2,8 +2,12 @@ package common
 
 import (
 	"context"
+	"fmt"
+	"github.com/cloudwego/hertz/pkg/common/utils"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	"github.com/hertz-contrib/requestid"
+	"net/http"
+	"os"
 	"time"
 
 	"github.com/cloudwego/hertz/pkg/app"
@@ -22,4 +26,22 @@ func Ping(ctx context.Context, c *app.RequestContext) {
 		Timestamp: timestamp,
 		RequestId: requestId,
 	}))
+}
+
+// DocsHandler handles the request for the API documentation.
+func DocsHandler(ctx context.Context, c *app.RequestContext) {
+	filename := fmt.Sprintf("docs/%s.tmpl", c.Param("file"))
+	if _, err := os.Stat(filename); os.IsNotExist(err) {
+		c.SetStatusCode(http.StatusNotFound)
+		c.SetBodyString("404 Not Found: The requested documentation file does not exist.")
+		return
+	}
+	c.HTML(http.StatusOK, filename, utils.H{
+		// custom data
+	})
+}
+
+// InvalidAPIPathHandler handles the request for invalid API paths.
+func InvalidAPIPathHandler(ctx context.Context, c *app.RequestContext) {
+	c.JSON(consts.StatusNotFound, APIResponseError(consts.StatusNotFound, "The requested API path does not exist."))
 }

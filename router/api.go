@@ -8,6 +8,8 @@ import (
 
 // apiRouteRegister registers all API routes.
 func apiRouteRegister(r *server.Hertz) {
+	r.NoMethod(common.InvalidAPIPathHandler)
+
 	common_ := r.Group("/common/v1")
 	common_.GET("/ping", common.Ping)
 

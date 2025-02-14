@@ -7,6 +7,7 @@ import (
 
 // isValidObjectPath checks if the object path is valid.
 func isValidObjectPath(objectPath string) bool {
+	// The object path must start with a slash and not end with a slash.
 	return len(objectPath) > 0 && objectPath[0] == '/' && objectPath[len(objectPath)-1] != '/'
 }
 
