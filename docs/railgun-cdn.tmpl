@@ -3,6 +3,19 @@
 
 <head>
     <title>Railgun CDN - Stargate</title>
+    <style>
+        html, body {
+            max-width: 50em;
+        }
+        table, th, td {
+            padding: 4px;
+            border: 2px solid #eeeeee;
+            border-collapse: collapse;
+        }
+        tr td:first-child {
+            white-space: nowrap;
+        }
+    </style>
 </head>
 
 <body>
@@ -27,25 +40,25 @@
                 <tr>
                     <td><code>X-App-Id</code></td>
                     <td>string</td>
-                    <td>¡Ì</td>
+                    <td>√</td>
                     <td>Tenant's AppID</td>
                 </tr>
                 <tr>
                     <td><code>X-App-Key</code></td>
                     <td>string</td>
-                    <td>¡Ì</td>
+                    <td>√</td>
                     <td>Tenant's AppKey</td>
                 </tr>
                 <tr>
                     <td><code>X-Object-Path</code></td>
                     <td>string</td>
-                    <td>¡Ì</td>
+                    <td>√</td>
                     <td>Full path of the object. Must start with a "/" and not end with a "/".</td>
                 </tr>
                 <tr>
                     <td><code>Content-Type</code></td>
                     <td>string</td>
-                    <td>¡Á</td>
+                    <td>×</td>
                     <td>The MIME type of the object, as defined in <a
                             href="https://datatracker.ietf.org/doc/html/rfc2046">RFC 2046</a>. If not present or an
                         empty
@@ -55,7 +68,7 @@
                 <tr>
                     <td><code>X-TTL</code></td>
                     <td>uint64</td>
-                    <td>¡Á</td>
+                    <td>×</td>
                     <td>The object's lifespan in seconds. The object will be deleted after this duration. Set to an
                         empty string ("") for an infinite lifespan (no expiration).</td>
                 </tr>
@@ -84,19 +97,19 @@
                 <tr>
                     <td><code>X-App-Id</code></td>
                     <td>string</td>
-                    <td>¡Ì</td>
+                    <td>√</td>
                     <td>Tenant's AppID</td>
                 </tr>
                 <tr>
                     <td><code>X-App-Key</code></td>
                     <td>string</td>
-                    <td>¡Ì</td>
+                    <td>√</td>
                     <td>Tenant's AppKey</td>
                 </tr>
                 <tr>
                     <td><code>X-Object-Path</code></td>
                     <td>string</td>
-                    <td>¡Ì</td>
+                    <td>√</td>
                     <td>Full path of the object. Must start with a "/" and not end with a "/".</td>
                 </tr>
             </tbody>
@@ -125,25 +138,25 @@
                 <tr>
                     <td><code>X-App-Id</code></td>
                     <td>string</td>
-                    <td>¡Ì</td>
+                    <td>√</td>
                     <td>Tenant's AppID</td>
                 </tr>
                 <tr>
                     <td><code>X-App-Key</code></td>
                     <td>string</td>
-                    <td>¡Ì</td>
+                    <td>√</td>
                     <td>Tenant's AppKey</td>
                 </tr>
                 <tr>
                     <td><code>X-Object-Path</code></td>
                     <td>string</td>
-                    <td>¡Ì</td>
+                    <td>√</td>
                     <td>Full path of the object. Must start with a "/" and not end with a "/".</td>
                 </tr>
                 <tr>
                     <td><code>X-TTL</code></td>
                     <td>uint64</td>
-                    <td>¡Á</td>
+                    <td>×</td>
                     <td>The URL's lifespan in seconds. The URL will expire after this duration. Set to an empty string
                         ("") for an infinite lifespan (no expiration).</td>
                 </tr>
