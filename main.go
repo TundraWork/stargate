@@ -20,6 +20,7 @@ func main() {
 	h.Use(
 		requestid.New(),
 	)
+	h.LoadHTMLGlob("docs/*")
 	router.Register(h)
 	h.Spin()
 }

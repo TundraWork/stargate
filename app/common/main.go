@@ -30,13 +30,14 @@ func Ping(ctx context.Context, c *app.RequestContext) {
 
 // DocsHandler handles the request for the API documentation.
 func DocsHandler(ctx context.Context, c *app.RequestContext) {
-	filename := fmt.Sprintf("docs/%s.tmpl", c.Param("file"))
+	template := fmt.Sprintf("%s.tmpl", c.Param("file"))
+	filename := fmt.Sprintf("docs/%s", template)
 	if _, err := os.Stat(filename); os.IsNotExist(err) {
 		c.SetStatusCode(http.StatusNotFound)
 		c.SetBodyString("404 Not Found: The requested documentation file does not exist.")
 		return
 	}
-	c.HTML(http.StatusOK, filename, utils.H{
+	c.HTML(http.StatusOK, template, utils.H{
 		// custom data
 	})
 }
