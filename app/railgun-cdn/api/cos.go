@@ -3,13 +3,14 @@ package api
 import (
 	"context"
 	"errors"
-	"github.com/tencentyun/cos-go-sdk-v5"
-	"github.com/tencentyun/cos-go-sdk-v5/debug"
-	"github.com/tundrawork/stargate/app/common"
 	"io"
 	"net/http"
 	"net/url"
 	"time"
+
+	"github.com/tencentyun/cos-go-sdk-v5"
+	"github.com/tencentyun/cos-go-sdk-v5/debug"
+	"github.com/tundrawork/stargate/app/common"
 )
 
 type ObjectMetadata struct {

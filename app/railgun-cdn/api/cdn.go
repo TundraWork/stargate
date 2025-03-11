@@ -3,8 +3,9 @@ package api
 import (
 	"crypto/md5"
 	"fmt"
-	"github.com/tundrawork/stargate/config"
 	"time"
+
+	"github.com/tundrawork/stargate/config"
 )
 
 // GetObjectPublicURL gets the public CDN URL of an object.

@@ -3,12 +3,13 @@ package common
 import (
 	"context"
 	"fmt"
-	"github.com/cloudwego/hertz/pkg/common/utils"
-	"github.com/cloudwego/hertz/pkg/protocol/consts"
-	"github.com/hertz-contrib/requestid"
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/cloudwego/hertz/pkg/common/utils"
+	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	"github.com/hertz-contrib/requestid"
 
 	"github.com/cloudwego/hertz/pkg/app"
 )

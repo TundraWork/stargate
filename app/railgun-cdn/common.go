@@ -2,6 +2,7 @@ package railgun_cdn
 
 import (
 	"errors"
+
 	"github.com/tundrawork/stargate/config"
 )
 

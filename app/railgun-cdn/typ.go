@@ -2,8 +2,9 @@ package railgun_cdn
 
 import (
 	"errors"
-	"github.com/cloudwego/hertz/pkg/app"
 	"strconv"
+
+	"github.com/cloudwego/hertz/pkg/app"
 )
 
 type CommonTenantRequest struct {

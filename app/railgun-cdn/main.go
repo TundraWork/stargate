@@ -3,6 +3,7 @@ package railgun_cdn
 import (
 	"context"
 	"errors"
+
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	"github.com/tencentyun/cos-go-sdk-v5"
