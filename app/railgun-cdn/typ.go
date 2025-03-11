@@ -23,10 +23,11 @@ func (req *CommonTenantRequest) FromRequestContext(c *app.RequestContext) error 
 	appID := c.GetHeader("X-App-Id")
 	appKey := c.GetHeader("X-App-Key")
 	objectPath := c.GetHeader("X-Object-Path")
-	if len(appID) == 0 || len(appKey) == 0 || len(objectPath) == 0 {
+
+	if len(appID) == 0 || len(appKey) == 0 {
 		return errors.New("missing common tenant request fields")
 	}
-	if !isValidObjectPath(string(objectPath)) {
+	if len(objectPath) > 0 && !isValidObjectPath(string(objectPath)) {
 		return errors.New("invalid object path")
 	}
 	ttlStr := string(c.GetHeader("X-TTL"))
