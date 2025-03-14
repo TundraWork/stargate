@@ -3,6 +3,7 @@ package railgun_cdn
 import (
 	"context"
 	"errors"
+	"github.com/cloudwego/hertz/pkg/common/hlog"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
@@ -34,11 +35,13 @@ func GetBucket(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusUnauthorized, common.APIResponseError(consts.StatusUnauthorized, err.Error()))
 		return
 	}
+	hlog.CtxInfof(ctx, "[RailgunCDN][Request] Method=%s AppID=%s", "GetBucket", tenantRequest.AppID)
 	prefix := rootPath
 	resp, err := api.GetBucket(ctx, prefix)
 	if err != nil {
 		var cosErr *cos.ErrorResponse
 		if errors.As(err, &cosErr) {
+			hlog.CtxErrorf(ctx, "[RailgunCDN][Error] Method=%s AppID=%s StatusCode=%d", "GetBucket", tenantRequest.AppID, cosErr.Response.StatusCode)
 			c.JSON(cosErr.Response.StatusCode, common.APIResponseError(cosErr.Response.StatusCode, cosErr.Response.Status))
 			return
 		}
@@ -58,6 +61,7 @@ func HeadObject(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusUnauthorized, common.APIResponseError(consts.StatusUnauthorized, err.Error()))
 		return
 	}
+	hlog.CtxInfof(ctx, "[RailgunCDN][Request] Method=%s AppID=%s ObjectPath=%s", "HeadObject", tenantRequest.AppID, tenantRequest.ObjectPath)
 	if tenantRequest.ObjectPath == "" {
 		c.JSON(consts.StatusBadRequest, common.APIResponseError(consts.StatusBadRequest, "missing object path"))
 		return
@@ -67,6 +71,7 @@ func HeadObject(ctx context.Context, c *app.RequestContext) {
 	if err != nil {
 		var cosErr *cos.ErrorResponse
 		if errors.As(err, &cosErr) {
+			hlog.CtxErrorf(ctx, "[RailgunCDN][Error] Method=%s AppID=%s StatusCode=%d", "HeadObject", tenantRequest.AppID, cosErr.Response.StatusCode)
 			c.JSON(cosErr.Response.StatusCode, common.APIResponseError(cosErr.Response.StatusCode, cosErr.Response.Status))
 			return
 		}
@@ -86,6 +91,7 @@ func PutObject(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusUnauthorized, common.APIResponseError(consts.StatusUnauthorized, err.Error()))
 		return
 	}
+	hlog.CtxInfof(ctx, "[RailgunCDN][Request] Method=%s AppID=%s ObjectPath=%s", "PutObject", tenantRequest.AppID, tenantRequest.ObjectPath)
 	if tenantRequest.ObjectPath == "" {
 		c.JSON(consts.StatusBadRequest, common.APIResponseError(consts.StatusBadRequest, "missing object path"))
 		return
@@ -96,6 +102,7 @@ func PutObject(ctx context.Context, c *app.RequestContext) {
 	if err != nil {
 		var cosErr *cos.ErrorResponse
 		if errors.As(err, &cosErr) {
+			hlog.CtxErrorf(ctx, "[RailgunCDN][Error] Method=%s AppID=%s StatusCode=%d", "PutObject", tenantRequest.AppID, cosErr.Response.StatusCode)
 			c.JSON(cosErr.Response.StatusCode, common.APIResponseError(cosErr.Response.StatusCode, cosErr.Response.Status))
 			return
 		}
@@ -115,6 +122,7 @@ func DeleteObject(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusUnauthorized, common.APIResponseError(consts.StatusUnauthorized, err.Error()))
 		return
 	}
+	hlog.CtxInfof(ctx, "[RailgunCDN][Request] Method=%s AppID=%s ObjectPath=%s", "DeleteObject", tenantRequest.AppID, tenantRequest.ObjectPath)
 	if tenantRequest.ObjectPath == "" {
 		c.JSON(consts.StatusBadRequest, common.APIResponseError(consts.StatusBadRequest, "missing object path"))
 		return
@@ -123,6 +131,7 @@ func DeleteObject(ctx context.Context, c *app.RequestContext) {
 	if err := api.DeleteObject(ctx, objectKey); err != nil {
 		var cosErr *cos.ErrorResponse
 		if errors.As(err, &cosErr) {
+			hlog.CtxErrorf(ctx, "[RailgunCDN][Error] Method=%s AppID=%s StatusCode=%d", "DeleteObject", tenantRequest.AppID, cosErr.Response.StatusCode)
 			c.JSON(cosErr.Response.StatusCode, common.APIResponseError(cosErr.Response.StatusCode, cosErr.Response.Status))
 			return
 		}
@@ -142,6 +151,7 @@ func GetURL(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusUnauthorized, common.APIResponseError(consts.StatusUnauthorized, err.Error()))
 		return
 	}
+	hlog.CtxInfof(ctx, "[RailgunCDN][Request] Method=%s AppID=%s ObjectPath=%s", "GetURL", tenantRequest.AppID, tenantRequest.ObjectPath)
 	if tenantRequest.ObjectPath == "" {
 		c.JSON(consts.StatusBadRequest, common.APIResponseError(consts.StatusBadRequest, "missing object path"))
 		return
@@ -149,6 +159,7 @@ func GetURL(ctx context.Context, c *app.RequestContext) {
 	objectKey := "/" + rootPath + tenantRequest.ObjectPath
 	url, expires, err := api.GetObjectPublicURL(objectKey, tenantRequest.TTL)
 	if err != nil {
+		hlog.CtxErrorf(ctx, "[RailgunCDN][Error] Method=%s AppID=%s Error=%s", "GetURL", tenantRequest.AppID, err.Error())
 		c.JSON(consts.StatusInternalServerError, common.APIResponseError(consts.StatusInternalServerError, err.Error()))
 		return
 	}
