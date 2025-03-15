@@ -51,7 +51,7 @@ func GetBucket(ctx context.Context, c *app.RequestContext) {
 	}
 	matomo.ReportEvent(ctx, matomo.Event{
 		ActionName: "railgun-cdn:server:GetBucket",
-		URL:        tenantRequest.ObjectPath,
+		URL:        config.Conf.Services.RailgunCDN.CDN.Endpoint + tenantRequest.ObjectPath,
 		UserAgent:  string(c.UserAgent()),
 		ClientIP:   c.ClientIP(),
 		ClientTime: time.Now(),
@@ -88,7 +88,7 @@ func HeadObject(ctx context.Context, c *app.RequestContext) {
 	}
 	matomo.ReportEvent(ctx, matomo.Event{
 		ActionName: "railgun-cdn:server:HeadObject",
-		URL:        tenantRequest.ObjectPath,
+		URL:        config.Conf.Services.RailgunCDN.CDN.Endpoint + tenantRequest.ObjectPath,
 		UserAgent:  string(c.UserAgent()),
 		ClientIP:   c.ClientIP(),
 		ClientTime: time.Now(),
@@ -126,7 +126,7 @@ func PutObject(ctx context.Context, c *app.RequestContext) {
 	}
 	matomo.ReportEvent(ctx, matomo.Event{
 		ActionName: "railgun-cdn:server:PutObject",
-		URL:        tenantRequest.ObjectPath,
+		URL:        config.Conf.Services.RailgunCDN.CDN.Endpoint + tenantRequest.ObjectPath,
 		UserAgent:  string(c.UserAgent()),
 		ClientIP:   c.ClientIP(),
 		ClientTime: time.Now(),
@@ -162,7 +162,7 @@ func DeleteObject(ctx context.Context, c *app.RequestContext) {
 	}
 	matomo.ReportEvent(ctx, matomo.Event{
 		ActionName: "railgun-cdn:server:DeleteObject",
-		URL:        tenantRequest.ObjectPath,
+		URL:        config.Conf.Services.RailgunCDN.CDN.Endpoint + tenantRequest.ObjectPath,
 		UserAgent:  string(c.UserAgent()),
 		ClientIP:   c.ClientIP(),
 		ClientTime: time.Now(),
@@ -196,7 +196,7 @@ func GetURL(ctx context.Context, c *app.RequestContext) {
 	}
 	matomo.ReportEvent(ctx, matomo.Event{
 		ActionName: "railgun-cdn:server:GetURL",
-		URL:        tenantRequest.ObjectPath,
+		URL:        config.Conf.Services.RailgunCDN.CDN.Endpoint + tenantRequest.ObjectPath,
 		UserAgent:  string(c.UserAgent()),
 		ClientIP:   c.ClientIP(),
 		ClientTime: time.Now(),
@@ -214,7 +214,7 @@ func ClientGateway(ctx context.Context, c *app.RequestContext) {
 	hlog.CtxInfof(ctx, "[RailgunCDN][Request] Method=%s URI=%s", "ClientGateway", objectPath)
 	matomo.ReportEvent(ctx, matomo.Event{
 		ActionName: "railgun-cdn:client:Gateway",
-		URL:        objectPath,
+		URL:        config.Conf.Services.RailgunCDN.CDN.Endpoint + objectPath,
 		UserAgent:  string(c.UserAgent()),
 		ClientIP:   c.ClientIP(),
 		ClientTime: time.Now(),
