@@ -50,7 +50,6 @@ type PrivateCDN struct {
 
 type MatomoClient struct {
 	Endpoint        string `yaml:"Endpoint"`
-	SiteID          string `yaml:"SiteID"`
 	AuthToken       string `yaml:"AuthToken"`
 	NumWorkers      int    `yaml:"NumWorkers"`
 	BatchSize       int    `yaml:"BatchSize"`
@@ -61,6 +60,7 @@ type RailgunCDNTenant struct {
 	RootPath string `yaml:"RootPath"`
 	AppID    string `yaml:"AppID"`
 	AppKey   string `yaml:"AppKey"`
+	SiteID   string `yaml:"SiteID"`
 }
 
 func Init() {

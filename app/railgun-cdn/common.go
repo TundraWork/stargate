@@ -6,6 +6,11 @@ import (
 	"github.com/tundrawork/stargate/config"
 )
 
+type TenantBusinessData struct {
+	RootPath string
+	SiteID   string
+}
+
 // isValidObjectPath checks if the object path is valid.
 func isValidObjectPath(objectPath string) bool {
 	// The object path must start with a slash and not end with a slash.
@@ -13,11 +18,14 @@ func isValidObjectPath(objectPath string) bool {
 }
 
 // authTenant authenticates the tenant from the common tenant request and returns the tenant's root path.
-func authTenant(req *CommonTenantRequest) (string, error) {
+func authTenant(req *CommonTenantRequest) (*TenantBusinessData, error) {
 	for _, tenant := range config.Conf.Services.RailgunCDN.Tenants {
 		if tenant.AppID == req.AppID && tenant.AppKey == req.AppKey {
-			return tenant.RootPath, nil
+			return &TenantBusinessData{
+				RootPath: tenant.RootPath,
+				SiteID:   tenant.SiteID,
+			}, nil
 		}
 	}
-	return "", errors.New("cannot authorize tenant")
+	return nil, errors.New("cannot authorize tenant")
 }

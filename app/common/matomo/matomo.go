@@ -15,6 +15,7 @@ import (
 
 // Event represents a single event to be tracked by Matomo.
 type Event struct {
+	SiteID     string    // Required: The site ID to track the event for
 	ActionName string    // Required: The name of the action being tracked
 	URL        string    // Required: The URL of the page/resource being accessed
 	UserAgent  string    // Required: The user's browser user agent
@@ -24,7 +25,6 @@ type Event struct {
 
 type Client struct {
 	matomoURL   string
-	siteID      string
 	authToken   string
 	httpClient  *http.Client
 	eventChan   chan Event
@@ -40,11 +40,10 @@ var (
 
 // InitClient initializes the Matomo client.  It should be called once,
 // typically during application startup.
-func InitClient(matomoURL string, siteID string, authToken string, numWorkers int, batchSize int, eventBufferSize int) {
+func InitClient(matomoURL string, authToken string, numWorkers int, batchSize int, eventBufferSize int) {
 	once.Do(func() {
 		clientInstance = &Client{
 			matomoURL: matomoURL,
-			siteID:    siteID,
 			authToken: authToken,
 			httpClient: &http.Client{
 				Timeout: 5 * time.Second, // Set a reasonable timeout
@@ -123,7 +122,7 @@ func (c *Client) sendBatch(ctx context.Context, events []Event) {
 	requests := make([]string, len(events))
 	for i, event := range events {
 		params := url.Values{}
-		params.Set("idsite", c.siteID)
+		params.Set("idsite", event.SiteID)
 		params.Set("rec", "1")
 		params.Set("action_name", event.ActionName)
 		params.Set("url", event.URL)

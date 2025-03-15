@@ -30,7 +30,6 @@ func main() {
 func initServices(server *server.Hertz) {
 	matomo.InitClient(
 		config.Conf.Matomo.Endpoint,
-		config.Conf.Matomo.SiteID,
 		config.Conf.Matomo.AuthToken,
 		config.Conf.Matomo.NumWorkers,
 		config.Conf.Matomo.BatchSize,

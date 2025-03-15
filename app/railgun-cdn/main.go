@@ -33,13 +33,13 @@ func GetBucket(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusBadRequest, common.APIResponseError(consts.StatusBadRequest, err.Error()))
 		return
 	}
-	rootPath, err := authTenant(tenantRequest)
+	tenant, err := authTenant(tenantRequest)
 	if err != nil {
 		c.JSON(consts.StatusUnauthorized, common.APIResponseError(consts.StatusUnauthorized, err.Error()))
 		return
 	}
 	hlog.CtxInfof(ctx, "[RailgunCDN][Request] Method=%s AppID=%s", "GetBucket", tenantRequest.AppID)
-	prefix := rootPath
+	prefix := tenant.RootPath
 	resp, err := api.GetBucket(ctx, prefix)
 	if err != nil {
 		var cosErr *cos.ErrorResponse
@@ -50,6 +50,7 @@ func GetBucket(ctx context.Context, c *app.RequestContext) {
 		}
 	}
 	matomo.ReportEvent(ctx, matomo.Event{
+		SiteID:     tenant.SiteID,
 		ActionName: "railgun-cdn:server:GetBucket",
 		URL:        config.Conf.Services.RailgunCDN.CDN.Endpoint + tenantRequest.ObjectPath,
 		UserAgent:  string(c.UserAgent()),
@@ -66,7 +67,7 @@ func HeadObject(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusBadRequest, common.APIResponseError(consts.StatusBadRequest, err.Error()))
 		return
 	}
-	rootPath, err := authTenant(tenantRequest)
+	tenant, err := authTenant(tenantRequest)
 	if err != nil {
 		c.JSON(consts.StatusUnauthorized, common.APIResponseError(consts.StatusUnauthorized, err.Error()))
 		return
@@ -76,7 +77,7 @@ func HeadObject(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusBadRequest, common.APIResponseError(consts.StatusBadRequest, "missing object path"))
 		return
 	}
-	objectKey := rootPath + tenantRequest.ObjectPath
+	objectKey := tenant.RootPath + tenantRequest.ObjectPath
 	resp, err := api.HeadObject(ctx, objectKey)
 	if err != nil {
 		var cosErr *cos.ErrorResponse
@@ -87,6 +88,7 @@ func HeadObject(ctx context.Context, c *app.RequestContext) {
 		}
 	}
 	matomo.ReportEvent(ctx, matomo.Event{
+		SiteID:     tenant.SiteID,
 		ActionName: "railgun-cdn:server:HeadObject",
 		URL:        config.Conf.Services.RailgunCDN.CDN.Endpoint + tenantRequest.ObjectPath,
 		UserAgent:  string(c.UserAgent()),
@@ -103,7 +105,7 @@ func PutObject(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusBadRequest, common.APIResponseError(consts.StatusBadRequest, err.Error()))
 		return
 	}
-	rootPath, err := authTenant(tenantRequest)
+	tenant, err := authTenant(tenantRequest)
 	if err != nil {
 		c.JSON(consts.StatusUnauthorized, common.APIResponseError(consts.StatusUnauthorized, err.Error()))
 		return
@@ -113,7 +115,7 @@ func PutObject(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusBadRequest, common.APIResponseError(consts.StatusBadRequest, "missing object path"))
 		return
 	}
-	objectKey := rootPath + tenantRequest.ObjectPath
+	objectKey := tenant.RootPath + tenantRequest.ObjectPath
 	contentType := string(c.GetHeader("Content-Type"))
 	resp, err := api.PutObject(ctx, objectKey, c.RequestBodyStream(), contentType, tenantRequest.TTL)
 	if err != nil {
@@ -125,6 +127,7 @@ func PutObject(ctx context.Context, c *app.RequestContext) {
 		}
 	}
 	matomo.ReportEvent(ctx, matomo.Event{
+		SiteID:     tenant.SiteID,
 		ActionName: "railgun-cdn:server:PutObject",
 		URL:        config.Conf.Services.RailgunCDN.CDN.Endpoint + tenantRequest.ObjectPath,
 		UserAgent:  string(c.UserAgent()),
@@ -141,7 +144,7 @@ func DeleteObject(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusBadRequest, common.APIResponseError(consts.StatusBadRequest, err.Error()))
 		return
 	}
-	rootPath, err := authTenant(tenantRequest)
+	tenant, err := authTenant(tenantRequest)
 	if err != nil {
 		c.JSON(consts.StatusUnauthorized, common.APIResponseError(consts.StatusUnauthorized, err.Error()))
 		return
@@ -151,7 +154,7 @@ func DeleteObject(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusBadRequest, common.APIResponseError(consts.StatusBadRequest, "missing object path"))
 		return
 	}
-	objectKey := rootPath + tenantRequest.ObjectPath
+	objectKey := tenant.RootPath + tenantRequest.ObjectPath
 	if err := api.DeleteObject(ctx, objectKey); err != nil {
 		var cosErr *cos.ErrorResponse
 		if errors.As(err, &cosErr) {
@@ -161,6 +164,7 @@ func DeleteObject(ctx context.Context, c *app.RequestContext) {
 		}
 	}
 	matomo.ReportEvent(ctx, matomo.Event{
+		SiteID:     tenant.SiteID,
 		ActionName: "railgun-cdn:server:DeleteObject",
 		URL:        config.Conf.Services.RailgunCDN.CDN.Endpoint + tenantRequest.ObjectPath,
 		UserAgent:  string(c.UserAgent()),
@@ -177,7 +181,7 @@ func GetURL(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusBadRequest, common.APIResponseError(consts.StatusBadRequest, err.Error()))
 		return
 	}
-	rootPath, err := authTenant(tenantRequest)
+	tenant, err := authTenant(tenantRequest)
 	if err != nil {
 		c.JSON(consts.StatusUnauthorized, common.APIResponseError(consts.StatusUnauthorized, err.Error()))
 		return
@@ -187,14 +191,15 @@ func GetURL(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusBadRequest, common.APIResponseError(consts.StatusBadRequest, "missing object path"))
 		return
 	}
-	objectKey := "/" + rootPath + tenantRequest.ObjectPath
-	privateURL, expires, err := api.GetObjectPrivateURL(objectKey, tenantRequest.TTL)
+	objectKey := "/" + tenant.RootPath + tenantRequest.ObjectPath
+	privateURL, expires, err := api.GetObjectPrivateURL(objectKey, tenantRequest.TTL, tenant.SiteID)
 	if err != nil {
 		hlog.CtxErrorf(ctx, "[RailgunCDN][Error] Method=%s AppID=%s Error=%s", "GetURL", tenantRequest.AppID, err.Error())
 		c.JSON(consts.StatusInternalServerError, common.APIResponseError(consts.StatusInternalServerError, err.Error()))
 		return
 	}
 	matomo.ReportEvent(ctx, matomo.Event{
+		SiteID:     tenant.SiteID,
 		ActionName: "railgun-cdn:server:GetURL",
 		URL:        config.Conf.Services.RailgunCDN.CDN.Endpoint + tenantRequest.ObjectPath,
 		UserAgent:  string(c.UserAgent()),
@@ -209,10 +214,16 @@ func GetURL(ctx context.Context, c *app.RequestContext) {
 
 // ClientGateway handles the client access request and redirects it to the actual object URL.
 func ClientGateway(ctx context.Context, c *app.RequestContext) {
+	siteId := c.Param("sid")
+	if siteId == "" {
+		c.JSON(consts.StatusBadRequest, common.APIResponseError(consts.StatusBadRequest, "missing sid"))
+		return
+	}
 	objectPath := "/" + c.Param("objectPath")
 	publicURL := config.Conf.Services.RailgunCDN.CDN.Endpoint + objectPath + "?" + string(c.URI().QueryString())
 	hlog.CtxInfof(ctx, "[RailgunCDN][Request] Method=%s URI=%s", "ClientGateway", objectPath)
 	matomo.ReportEvent(ctx, matomo.Event{
+		SiteID:     siteId,
 		ActionName: "railgun-cdn:client:Gateway",
 		URL:        config.Conf.Services.RailgunCDN.CDN.Endpoint + objectPath,
 		UserAgent:  string(c.UserAgent()),

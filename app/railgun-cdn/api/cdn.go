@@ -9,8 +9,12 @@ import (
 )
 
 // GetObjectPrivateURL gets the private CDN URL of an object.
-func GetObjectPrivateURL(objectKey string, ttl int64) (publicURL string, expires int64, err error) {
-	return GetObjectURL(config.Conf.Services.RailgunCDN.Private.Endpoint, objectKey, ttl)
+func GetObjectPrivateURL(objectKey string, ttl int64, siteId string) (publicURL string, expires int64, err error) {
+	url, expires, err := GetObjectURL(config.Conf.Services.RailgunCDN.Private.Endpoint, objectKey, ttl)
+	if err != nil {
+		return "", -1, err
+	}
+	return fmt.Sprintf("%s&sid=%s", url, siteId), expires, nil
 }
 
 // GetObjectPublicURL gets the public CDN URL of an object.
