@@ -7,11 +7,10 @@ import (
 	"os"
 	"time"
 
+	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/common/utils"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	"github.com/hertz-contrib/requestid"
-
-	"github.com/cloudwego/hertz/pkg/app"
 )
 
 type PingResponseData struct {

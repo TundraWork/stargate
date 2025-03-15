@@ -2,8 +2,10 @@ package main
 
 import (
 	"context"
+
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/hertz-contrib/requestid"
+
 	"github.com/tundrawork/stargate/app/common/matomo"
 	railgunCDN "github.com/tundrawork/stargate/app/railgun-cdn"
 	"github.com/tundrawork/stargate/config"

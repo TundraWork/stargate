@@ -3,7 +3,6 @@ package matomo
 import (
 	"bytes"
 	"context"
-	"github.com/cloudwego/hertz/pkg/common/json"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -11,6 +10,7 @@ import (
 	"time"
 
 	"github.com/cloudwego/hertz/pkg/common/hlog"
+	"github.com/cloudwego/hertz/pkg/common/json"
 )
 
 // Event represents a single event to be tracked by Matomo.
@@ -65,7 +65,7 @@ func InitClient(matomoURL string, authToken string, numWorkers int, batchSize in
 	})
 }
 
-// ReportEvent queues an event for reporting to Matomo.  It returns immediately.
+// ReportEvent queues an event for reporting to Matomo.
 func ReportEvent(ctx context.Context, event Event) {
 	if clientInstance == nil {
 		hlog.CtxErrorf(ctx, "[Matomo] ReportEvent called before InitMatomoClient")
@@ -79,7 +79,7 @@ func ReportEvent(ctx context.Context, event Event) {
 	}
 }
 
-// eventWorker is the worker goroutine that processes events from the channel.
+// eventWorker implements the worker goroutine that processes events from the channel.
 func (c *Client) eventWorker(workerID int) {
 	defer c.workerGroup.Done()
 	hlog.Infof("[Matomo] Starting worker %d", workerID)
@@ -113,7 +113,7 @@ func (c *Client) eventWorker(workerID int) {
 	}
 }
 
-// sendEvent sends a single event to Matomo.
+// sendBatch implements the logic to send a batch of events to Matomo.
 func (c *Client) sendBatch(ctx context.Context, events []Event) {
 	if len(events) == 0 {
 		return

@@ -2,6 +2,7 @@ package router
 
 import (
 	"github.com/cloudwego/hertz/pkg/app/server"
+
 	"github.com/tundrawork/stargate/app/common"
 	railgunCDN "github.com/tundrawork/stargate/app/railgun-cdn"
 )
