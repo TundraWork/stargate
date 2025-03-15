@@ -14,9 +14,10 @@ var (
 )
 
 type Config struct {
-	ListenPort         string   `yaml:"ListenPort"`
-	MaxRequestBodySize int      `yaml:"MaxRequestBodySize"`
-	Services           Services `yaml:"Services"`
+	ListenPort         string       `yaml:"ListenPort"`
+	MaxRequestBodySize int          `yaml:"MaxRequestBodySize"`
+	Matomo             MatomoClient `yaml:"Matomo"`
+	Services           Services     `yaml:"Services"`
 }
 
 type Services struct {
@@ -27,7 +28,6 @@ type RailgunCDN struct {
 	COS     TencentCOS         `yaml:"COS"`
 	CDN     TencentCDN         `yaml:"CDN"`
 	Private PrivateCDN         `yaml:"Private"`
-	Matomo  MatomoService      `yaml:"Matomo"`
 	Tenants []RailgunCDNTenant `yaml:"Tenants"`
 }
 
@@ -48,10 +48,12 @@ type PrivateCDN struct {
 	Endpoint string `yaml:"Endpoint"`
 }
 
-type MatomoService struct {
-	Endpoint  string `yaml:"Endpoint"`
-	SiteID    int    `yaml:"SiteID"`
-	AuthToken string `yaml:"AuthToken"`
+type MatomoClient struct {
+	Endpoint        string `yaml:"Endpoint"`
+	SiteID          string `yaml:"SiteID"`
+	AuthToken       string `yaml:"AuthToken"`
+	NumWorkers      int    `yaml:"NumWorkers"`
+	EventBufferSize int    `yaml:"EventBufferSize"`
 }
 
 type RailgunCDNTenant struct {
