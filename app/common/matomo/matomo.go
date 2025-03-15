@@ -129,7 +129,7 @@ func (c *Client) sendBatch(ctx context.Context, events []Event) {
 		params.Set("url", event.URL)
 		params.Set("ua", event.UserAgent)
 		params.Set("cip", event.ClientIP)
-		params.Set("cdt", event.ClientTime.Format("2006-01-02 15:04:05"))
+		params.Set("cdt", event.ClientTime.UTC().Format("2006-01-02 15:04:05"))
 		params.Set("apiv", "1")
 		params.Set("rand", strconv.FormatInt(time.Now().UnixNano(), 10))
 		requests[i] = "?" + params.Encode()
