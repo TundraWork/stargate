@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"net/url"
+	"strings"
 	"sync"
 	"time"
 
@@ -111,12 +112,12 @@ func (c *Client) sendEvent(ctx context.Context, event Event) {
 	}
 
 	matomoURL.RawQuery = params.Encode()
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, matomoURL.String(), nil)
-
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, matomoURL.String(), strings.NewReader(params.Encode()))
 	if err != nil {
 		hlog.CtxErrorf(ctx, "[Matomo] Error creating request: %v", err)
 		return
 	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
