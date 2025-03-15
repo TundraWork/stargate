@@ -8,8 +8,18 @@ import (
 	"github.com/tundrawork/stargate/config"
 )
 
+// GetObjectPrivateURL gets the private CDN URL of an object.
+func GetObjectPrivateURL(objectKey string, ttl int64) (publicURL string, expires int64, err error) {
+	return GetObjectURL(config.Conf.Services.RailgunCDN.Private.Endpoint, objectKey, ttl)
+}
+
 // GetObjectPublicURL gets the public CDN URL of an object.
 func GetObjectPublicURL(objectKey string, ttl int64) (publicURL string, expires int64, err error) {
+	return GetObjectURL(config.Conf.Services.RailgunCDN.CDN.Endpoint, objectKey, ttl)
+}
+
+// GetObjectURL gets the URL of an object using specific endpoint.
+func GetObjectURL(endpoint string, objectKey string, ttl int64) (url string, expires int64, err error) {
 	if ttl <= 0 {
 		return "", -1, fmt.Errorf("ttl must be a positive integer")
 	}
@@ -22,12 +32,12 @@ func GetObjectPublicURL(objectKey string, ttl int64) (publicURL string, expires 
 	hashable := fmt.Sprintf("%s%s%d", config.Conf.Services.RailgunCDN.CDN.PKey, objectKey, timestamp)
 	sign := fmt.Sprintf("%x", md5.Sum([]byte(hashable)))
 
-	publicURL = fmt.Sprintf("%s%s?sign=%s&t=%d",
-		config.Conf.Services.RailgunCDN.CDN.Endpoint,
+	url = fmt.Sprintf("%s%s?sign=%s&t=%d",
+		endpoint,
 		objectKey,
 		sign,
 		timestamp,
 	)
 
-	return publicURL, expires, nil
+	return url, expires, nil
 }

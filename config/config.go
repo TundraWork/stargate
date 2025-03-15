@@ -26,6 +26,8 @@ type Services struct {
 type RailgunCDN struct {
 	COS     TencentCOS         `yaml:"COS"`
 	CDN     TencentCDN         `yaml:"CDN"`
+	Private PrivateCDN         `yaml:"Private"`
+	Matomo  MatomoService      `yaml:"Matomo"`
 	Tenants []RailgunCDNTenant `yaml:"Tenants"`
 }
 
@@ -40,6 +42,16 @@ type TencentCDN struct {
 	Endpoint        string `yaml:"Endpoint"`
 	PKey            string `yaml:"PKey"`
 	TimestampOffset int64  `yaml:"TimestampOffset"`
+}
+
+type PrivateCDN struct {
+	Endpoint string `yaml:"Endpoint"`
+}
+
+type MatomoService struct {
+	Endpoint  string `yaml:"Endpoint"`
+	SiteID    int    `yaml:"SiteID"`
+	AuthToken string `yaml:"AuthToken"`
 }
 
 type RailgunCDNTenant struct {

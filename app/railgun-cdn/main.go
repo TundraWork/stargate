@@ -3,14 +3,14 @@ package railgun_cdn
 import (
 	"context"
 	"errors"
-	"github.com/cloudwego/hertz/pkg/common/hlog"
-
 	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	"github.com/tencentyun/cos-go-sdk-v5"
 	"github.com/tundrawork/stargate/app/common"
 	"github.com/tundrawork/stargate/app/railgun-cdn/api"
 	"github.com/tundrawork/stargate/config"
+	"time"
 )
 
 // Init initializes the Railgun CDN service.
@@ -20,6 +20,11 @@ func Init() {
 		config.Conf.Services.RailgunCDN.COS.Region,
 		config.Conf.Services.RailgunCDN.COS.SecretID,
 		config.Conf.Services.RailgunCDN.COS.SecretKey,
+	)
+	api.InitMatomoClient(
+		config.Conf.Services.RailgunCDN.Matomo.Endpoint,
+		config.Conf.Services.RailgunCDN.Matomo.SiteID,
+		config.Conf.Services.RailgunCDN.Matomo.AuthToken,
 	)
 }
 
@@ -157,14 +162,34 @@ func GetURL(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 	objectKey := "/" + rootPath + tenantRequest.ObjectPath
-	url, expires, err := api.GetObjectPublicURL(objectKey, tenantRequest.TTL)
+	privateURL, expires, err := api.GetObjectPrivateURL(objectKey, tenantRequest.TTL)
 	if err != nil {
 		hlog.CtxErrorf(ctx, "[RailgunCDN][Error] Method=%s AppID=%s Error=%s", "GetURL", tenantRequest.AppID, err.Error())
 		c.JSON(consts.StatusInternalServerError, common.APIResponseError(consts.StatusInternalServerError, err.Error()))
 		return
 	}
 	c.JSON(consts.StatusOK, common.APIResponseSuccess(GetURLResponse{
-		URL:     url,
+		URL:     privateURL,
 		Expires: expires,
 	}))
+}
+
+// ClientGateway handles the client access request and redirects it to the actual object URL.
+func ClientGateway(ctx context.Context, c *app.RequestContext) {
+	objectPath := "/" + c.Param("objectPath")
+	publicURL := config.Conf.Services.RailgunCDN.CDN.Endpoint + objectPath + string(c.URI().QueryString())
+	defer func(event api.Event) {
+		err := api.TrackEvent(event)
+		if err != nil {
+			hlog.CtxErrorf(ctx, "[RailgunCDN][Error] Method=%s Error=%s", "ClientGateway", err.Error())
+		}
+	}(api.Event{
+		ActionName: "client:access",
+		URL:        objectPath,
+		UserAgent:  string(c.UserAgent()),
+		ClientIP:   c.ClientIP(),
+		ClientTime: time.Now(),
+	})
+	hlog.CtxInfof(ctx, "[RailgunCDN][Request] Method=%s URI=%s", "ClientGateway", objectPath)
+	c.Redirect(consts.StatusMovedPermanently, []byte(publicURL))
 }
