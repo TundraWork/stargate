@@ -1,10 +1,12 @@
 package matomo
 
 import (
+	"bytes"
 	"context"
+	"github.com/cloudwego/hertz/pkg/common/json"
 	"net/http"
 	"net/url"
-	"strings"
+	"strconv"
 	"sync"
 	"time"
 
@@ -28,6 +30,7 @@ type Client struct {
 	eventChan   chan Event
 	stopChan    chan struct{}
 	workerGroup sync.WaitGroup
+	batchSize   int
 }
 
 var (
@@ -37,7 +40,7 @@ var (
 
 // InitClient initializes the Matomo client.  It should be called once,
 // typically during application startup.
-func InitClient(matomoURL string, siteID string, authToken string, numWorkers int, eventBufferSize int) {
+func InitClient(matomoURL string, siteID string, authToken string, numWorkers int, batchSize int, eventBufferSize int) {
 	once.Do(func() {
 		clientInstance = &Client{
 			matomoURL: matomoURL,
@@ -48,6 +51,7 @@ func InitClient(matomoURL string, siteID string, authToken string, numWorkers in
 			},
 			eventChan: make(chan Event, eventBufferSize),
 			stopChan:  make(chan struct{}),
+			batchSize: batchSize,
 		}
 
 		if numWorkers <= 0 {
@@ -80,48 +84,71 @@ func ReportEvent(ctx context.Context, event Event) {
 func (c *Client) eventWorker(workerID int) {
 	defer c.workerGroup.Done()
 	hlog.Infof("[Matomo] Starting worker %d", workerID)
+
+	// Use a ticker for batch processing
+	ticker := time.NewTicker(1 * time.Second) // Send batches every second (or when full)
+	defer ticker.Stop()
+
+	var batch []Event
 	for {
 		select {
 		case event := <-c.eventChan:
-			c.sendEvent(context.Background(), event) // Use a background context for sending
+			batch = append(batch, event)
+			if len(batch) >= c.batchSize {
+				c.sendBatch(context.Background(), batch)
+				batch = nil // Reset the batch
+			}
+		case <-ticker.C:
+			if len(batch) > 0 {
+				c.sendBatch(context.Background(), batch)
+				batch = nil // Reset the batch
+			}
 		case <-c.stopChan:
 			hlog.Infof("[Matomo] Stopping worker %d", workerID)
+			// Send any remaining events before exiting
+			if len(batch) > 0 {
+				c.sendBatch(context.Background(), batch)
+			}
 			return
 		}
 	}
 }
 
 // sendEvent sends a single event to Matomo.
-func (c *Client) sendEvent(ctx context.Context, event Event) {
-	params := url.Values{}
-	params.Set("idsite", c.siteID)
-	params.Set("rec", "1")
-	params.Set("action_name", event.ActionName)
-	params.Set("url", event.URL)
-	params.Set("ua", event.UserAgent)
-	params.Set("cip", event.ClientIP)
-	// Format datetime according to Matomo spec:  YYYY-MM-DD HH:MM:SS
-	params.Set("cdt", event.ClientTime.Format("2006-01-02 15:04:05"))
-	params.Set("apiv", "1")
-	params.Set("token_auth", c.authToken)
-
-	matomoURL, err := url.Parse(c.matomoURL)
-	if err != nil {
-		hlog.CtxErrorf(ctx, "[Matomo] Invalid Matomo URL: %v", err)
+func (c *Client) sendBatch(ctx context.Context, events []Event) {
+	if len(events) == 0 {
 		return
 	}
 
-	matomoURL.RawQuery = params.Encode()
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, matomoURL.String(), strings.NewReader(params.Encode()))
+	requests := make([]string, len(events))
+	for i, event := range events {
+		params := url.Values{}
+		params.Set("idsite", c.siteID)
+		params.Set("rec", "1")
+		params.Set("action_name", event.ActionName)
+		params.Set("url", event.URL)
+		params.Set("ua", event.UserAgent)
+		params.Set("cip", event.ClientIP)
+		params.Set("cdt", event.ClientTime.Format("2006-01-02 15:04:05"))
+		params.Set("apiv", "1")
+		params.Set("rand", strconv.FormatInt(time.Now().UnixNano(), 10))
+		requests[i] = "?" + params.Encode()
+	}
+
+	payload := map[string]interface{}{
+		"requests":   requests,
+		"token_auth": c.authToken,
+	}
+
+	jsonData, err := json.Marshal(payload)
 	if err != nil {
-		hlog.CtxErrorf(ctx, "[Matomo] Error creating request: %v", err)
+		hlog.CtxErrorf(ctx, "[Matomo] Error marshaling JSON: %v", err)
 		return
 	}
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
-	resp, err := c.httpClient.Do(req)
+	resp, err := c.httpClient.Post(c.matomoURL, "application/json", bytes.NewBuffer(jsonData))
 	if err != nil {
-		hlog.CtxErrorf(ctx, "[Matomo] Error sending event: %v", err)
+		hlog.CtxErrorf(ctx, "[Matomo] Error sending batch: %v", err)
 		return
 	}
 	defer resp.Body.Close()
@@ -131,7 +158,7 @@ func (c *Client) sendEvent(ctx context.Context, event Event) {
 		return
 	}
 
-	hlog.CtxInfof(ctx, "[Matomo] Successfully sent event: %s", event.ActionName)
+	hlog.CtxInfof(ctx, "[Matomo] Successfully sent batch of %d events", len(events))
 }
 
 // Shutdown gracefully shuts down the Matomo client, waiting for all pending events to be processed.

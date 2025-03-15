@@ -53,6 +53,7 @@ type MatomoClient struct {
 	SiteID          string `yaml:"SiteID"`
 	AuthToken       string `yaml:"AuthToken"`
 	NumWorkers      int    `yaml:"NumWorkers"`
+	BatchSize       int    `yaml:"BatchSize"`
 	EventBufferSize int    `yaml:"EventBufferSize"`
 }
 

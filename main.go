@@ -33,6 +33,7 @@ func initServices(server *server.Hertz) {
 		config.Conf.Matomo.SiteID,
 		config.Conf.Matomo.AuthToken,
 		config.Conf.Matomo.NumWorkers,
+		config.Conf.Matomo.BatchSize,
 		config.Conf.Matomo.EventBufferSize,
 	)
 	server.OnShutdown = append(server.OnShutdown, func(ctx context.Context) {
