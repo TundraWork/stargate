@@ -214,10 +214,10 @@ func GetURL(ctx context.Context, c *app.RequestContext) {
 
 // ClientGateway handles the client access request and redirects it to the actual object URL.
 func ClientGateway(ctx context.Context, c *app.RequestContext) {
-	appId := c.Param("a")
-	objectPath := c.Param("o")
-	sign := c.Param("s")
-	timestamp := c.Param("t")
+	appId := c.Query("a")
+	objectPath := c.Query("o")
+	sign := c.Query("s")
+	timestamp := c.Query("t")
 	if appId == "" || objectPath == "" || sign == "" || timestamp == "" {
 		c.JSON(consts.StatusBadRequest, common.APIResponseError(consts.StatusBadRequest, "missing required parameter"))
 		return
