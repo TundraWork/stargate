@@ -3,6 +3,7 @@ package railgun_cdn
 import (
 	"errors"
 	"fmt"
+	"net/url"
 
 	"github.com/tundrawork/stargate/app/railgun-cdn/api"
 	"github.com/tundrawork/stargate/config"
@@ -42,10 +43,10 @@ func getObjectPrivateURL(tenant *TenantBusinessData, tenantRequest *CommonTenant
 		return "", -1, err
 	}
 	privateURL = fmt.Sprintf(
-		"%s?a=%so=%s&s=%s&t=%d",
+		"%s?a=%s&o=%s&s=%s&t=%d",
 		config.Conf.Services.RailgunCDN.Private.Endpoint,
-		tenant.AppID,
-		tenantRequest.ObjectPath,
+		url.QueryEscape(tenant.AppID),
+		url.QueryEscape(tenantRequest.ObjectPath),
 		sign,
 		timestamp,
 	)
