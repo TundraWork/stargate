@@ -2,11 +2,14 @@ package railgun_cdn
 
 import (
 	"errors"
+	"fmt"
 
+	"github.com/tundrawork/stargate/app/railgun-cdn/api"
 	"github.com/tundrawork/stargate/config"
 )
 
 type TenantBusinessData struct {
+	AppID    string
 	RootPath string
 	SiteID   string
 }
@@ -19,13 +22,32 @@ func isValidObjectPath(objectPath string) bool {
 
 // authTenant authenticates the tenant from the common tenant request and returns the tenant's root path.
 func authTenant(req *CommonTenantRequest) (*TenantBusinessData, error) {
-	for _, tenant := range config.Conf.Services.RailgunCDN.Tenants {
-		if tenant.AppID == req.AppID && tenant.AppKey == req.AppKey {
+	if tenant, ok := config.Conf.Services.RailgunCDN.Tenants[req.AppID]; ok {
+		if tenant.AppKey == req.AppKey {
 			return &TenantBusinessData{
+				AppID:    req.AppID,
 				RootPath: tenant.RootPath,
 				SiteID:   tenant.SiteID,
 			}, nil
 		}
 	}
-	return nil, errors.New("cannot authorize tenant")
+	return nil, errors.New("tenant authorization failed")
+}
+
+// getObjectPrivateURL gets the private CDN URL of an object.
+func getObjectPrivateURL(tenant *TenantBusinessData, tenantRequest *CommonTenantRequest) (privateURL string, expires int64, err error) {
+	objectKey := "/" + tenant.RootPath + tenantRequest.ObjectPath
+	sign, timestamp, expires, err := api.SignObject(objectKey, tenantRequest.TTL)
+	if err != nil {
+		return "", -1, err
+	}
+	privateURL = fmt.Sprintf(
+		"%s?a=%so=%s&s=%s&t=%d",
+		config.Conf.Services.RailgunCDN.Private.Endpoint,
+		tenant.AppID,
+		tenantRequest.ObjectPath,
+		sign,
+		timestamp,
+	)
+	return privateURL, expires, nil
 }

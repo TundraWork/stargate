@@ -3,6 +3,7 @@ package matomo
 import (
 	"bytes"
 	"context"
+	"io"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -150,7 +151,9 @@ func (c *Client) sendBatch(ctx context.Context, events []Event) {
 		hlog.CtxErrorf(ctx, "[Matomo] Error sending batch: %v", err)
 		return
 	}
-	defer resp.Body.Close()
+	defer func(body io.ReadCloser) {
+		_ = body.Close() // Ignore error
+	}(resp.Body)
 
 	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusNoContent {
 		hlog.CtxErrorf(ctx, "[Matomo] Matomo returned non-OK status: %d", resp.StatusCode)

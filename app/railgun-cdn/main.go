@@ -3,6 +3,7 @@ package railgun_cdn
 import (
 	"context"
 	"errors"
+	"strconv"
 	"time"
 
 	"github.com/cloudwego/hertz/pkg/app"
@@ -191,8 +192,7 @@ func GetURL(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusBadRequest, common.APIResponseError(consts.StatusBadRequest, "missing object path"))
 		return
 	}
-	objectKey := "/" + tenant.RootPath + tenantRequest.ObjectPath
-	privateURL, expires, err := api.GetObjectPrivateURL(objectKey, tenantRequest.TTL, tenant.SiteID)
+	privateURL, expires, err := getObjectPrivateURL(tenant, tenantRequest)
 	if err != nil {
 		hlog.CtxErrorf(ctx, "[RailgunCDN][Error] Method=%s AppID=%s Error=%s", "GetURL", tenantRequest.AppID, err.Error())
 		c.JSON(consts.StatusInternalServerError, common.APIResponseError(consts.StatusInternalServerError, err.Error()))
@@ -214,13 +214,27 @@ func GetURL(ctx context.Context, c *app.RequestContext) {
 
 // ClientGateway handles the client access request and redirects it to the actual object URL.
 func ClientGateway(ctx context.Context, c *app.RequestContext) {
-	siteId := c.Param("sid")
-	if siteId == "" {
-		c.JSON(consts.StatusBadRequest, common.APIResponseError(consts.StatusBadRequest, "missing sid"))
+	appId := c.Param("a")
+	objectPath := c.Param("o")
+	sign := c.Param("s")
+	timestamp := c.Param("t")
+	if appId == "" || objectPath == "" || sign == "" || timestamp == "" {
+		c.JSON(consts.StatusBadRequest, common.APIResponseError(consts.StatusBadRequest, "missing required parameter"))
 		return
 	}
-	objectPath := "/" + c.Param("objectPath")
-	publicURL := config.Conf.Services.RailgunCDN.CDN.Endpoint + objectPath + "?" + string(c.URI().QueryString())
+	var siteId string
+	if tenant, ok := config.Conf.Services.RailgunCDN.Tenants[appId]; ok {
+		siteId = tenant.SiteID
+	} else {
+		c.JSON(consts.StatusBadRequest, common.APIResponseError(consts.StatusBadRequest, "invalid parameter"))
+		return
+	}
+	timestampParsed, err := strconv.ParseInt(timestamp, 10, 64)
+	if err != nil {
+		c.JSON(consts.StatusBadRequest, common.APIResponseError(consts.StatusBadRequest, "invalid parameter"))
+		return
+	}
+	publicURL := api.GetObjectPublicURL(appId, objectPath, sign, timestampParsed)
 	hlog.CtxInfof(ctx, "[RailgunCDN][Request] Method=%s URI=%s", "ClientGateway", objectPath)
 	matomo.ReportEvent(ctx, matomo.Event{
 		SiteID:     siteId,

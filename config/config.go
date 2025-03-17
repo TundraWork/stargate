@@ -25,10 +25,18 @@ type Services struct {
 }
 
 type RailgunCDN struct {
-	COS     TencentCOS         `yaml:"COS"`
-	CDN     TencentCDN         `yaml:"CDN"`
-	Private PrivateCDN         `yaml:"Private"`
-	Tenants []RailgunCDNTenant `yaml:"Tenants"`
+	COS     TencentCOS                                 `yaml:"COS"`
+	CDN     TencentCDN                                 `yaml:"CDN"`
+	Private PrivateCDN                                 `yaml:"Private"`
+	Tenants map[RailgunCDNTenantAppID]RailgunCDNTenant `yaml:"Tenants"`
+}
+
+type RailgunCDNTenantAppID = string
+
+type RailgunCDNTenant struct {
+	AppKey   string `yaml:"AppKey"`
+	RootPath string `yaml:"RootPath"`
+	SiteID   string `yaml:"SiteID"`
 }
 
 type TencentCOS struct {
@@ -54,13 +62,6 @@ type MatomoClient struct {
 	NumWorkers      int    `yaml:"NumWorkers"`
 	BatchSize       int    `yaml:"BatchSize"`
 	EventBufferSize int    `yaml:"EventBufferSize"`
-}
-
-type RailgunCDNTenant struct {
-	RootPath string `yaml:"RootPath"`
-	AppID    string `yaml:"AppID"`
-	AppKey   string `yaml:"AppKey"`
-	SiteID   string `yaml:"SiteID"`
 }
 
 func Init() {

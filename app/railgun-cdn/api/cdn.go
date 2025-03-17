@@ -8,40 +8,30 @@ import (
 	"github.com/tundrawork/stargate/config"
 )
 
-// GetObjectPrivateURL gets the private CDN URL of an object.
-func GetObjectPrivateURL(objectKey string, ttl int64, siteId string) (publicURL string, expires int64, err error) {
-	url, expires, err := GetObjectURL(config.Conf.Services.RailgunCDN.Private.Endpoint, objectKey, ttl)
-	if err != nil {
-		return "", -1, err
-	}
-	return fmt.Sprintf("%s&sid=%s", url, siteId), expires, nil
-}
-
 // GetObjectPublicURL gets the public CDN URL of an object.
-func GetObjectPublicURL(objectKey string, ttl int64) (publicURL string, expires int64, err error) {
-	return GetObjectURL(config.Conf.Services.RailgunCDN.CDN.Endpoint, objectKey, ttl)
-}
-
-// GetObjectURL gets the URL of an object using specific endpoint.
-func GetObjectURL(endpoint string, objectKey string, ttl int64) (url string, expires int64, err error) {
-	if ttl <= 0 {
-		return "", -1, fmt.Errorf("ttl must be a positive integer")
-	}
-	if len(objectKey) == 0 || objectKey[len(objectKey)-1] == '/' {
-		return "", -1, fmt.Errorf("invalid object key")
-	}
-
-	expires = time.Now().Unix() + ttl
-	timestamp := expires + config.Conf.Services.RailgunCDN.CDN.TimestampOffset
-	hashable := fmt.Sprintf("%s%s%d", config.Conf.Services.RailgunCDN.CDN.PKey, objectKey, timestamp)
-	sign := fmt.Sprintf("%x", md5.Sum([]byte(hashable)))
-
-	url = fmt.Sprintf("%s%s?sign=%s&t=%d",
-		endpoint,
-		objectKey,
+func GetObjectPublicURL(appId, objectPath, sign string, timestamp int64) string {
+	return fmt.Sprintf("%s/%s%s?sign=%s&t=%d",
+		config.Conf.Services.RailgunCDN.CDN.Endpoint,
+		appId,
+		objectPath,
 		sign,
 		timestamp,
 	)
+}
 
-	return url, expires, nil
+// SignObject gets the URL of an object using specific endpoint.
+func SignObject(objectKey string, ttl int64) (sign string, timestamp int64, expires int64, err error) {
+	if ttl <= 0 {
+		return "", -1, -1, fmt.Errorf("ttl must be a positive integer")
+	}
+	if len(objectKey) == 0 || objectKey[len(objectKey)-1] == '/' {
+		return "", -1, -1, fmt.Errorf("invalid object key")
+	}
+
+	expires = time.Now().Unix() + ttl
+	timestamp = expires + config.Conf.Services.RailgunCDN.CDN.TimestampOffset
+	hashable := fmt.Sprintf("%s%s%d", config.Conf.Services.RailgunCDN.CDN.PKey, objectKey, timestamp)
+	sign = fmt.Sprintf("%x", md5.Sum([]byte(hashable)))
+
+	return sign, timestamp, expires, nil
 }
