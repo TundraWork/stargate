@@ -6,8 +6,9 @@ import (
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/hertz-contrib/requestid"
 
+	"github.com/tundrawork/stargate/app/common"
 	"github.com/tundrawork/stargate/app/common/matomo"
-	railgunCDN "github.com/tundrawork/stargate/app/railgun-cdn"
+	"github.com/tundrawork/stargate/app/railgun_cdn"
 	"github.com/tundrawork/stargate/config"
 	"github.com/tundrawork/stargate/router"
 )
@@ -30,15 +31,9 @@ func main() {
 }
 
 func initServices(server *server.Hertz) {
-	matomo.InitClient(
-		config.Conf.Matomo.Endpoint,
-		config.Conf.Matomo.AuthToken,
-		config.Conf.Matomo.NumWorkers,
-		config.Conf.Matomo.BatchSize,
-		config.Conf.Matomo.EventBufferSize,
-	)
 	server.OnShutdown = append(server.OnShutdown, func(ctx context.Context) {
 		matomo.Shutdown(ctx)
 	})
-	railgunCDN.Init()
+	common.Init()
+	railgun_cdn.Init()
 }

@@ -39,8 +39,8 @@ var (
 	once           sync.Once
 )
 
-// InitClient initializes the Matomo client.  It should be called once,
-// typically during application startup.
+// InitClient initializes the Matomo client.
+// It should be called once, typically during application startup.
 func InitClient(matomoURL string, authToken string, numWorkers int, batchSize int, eventBufferSize int) {
 	once.Do(func() {
 		clientInstance = &Client{

@@ -13,7 +13,7 @@ import (
 
 	"github.com/tundrawork/stargate/app/common"
 	"github.com/tundrawork/stargate/app/common/matomo"
-	"github.com/tundrawork/stargate/app/railgun-cdn/api"
+	"github.com/tundrawork/stargate/app/railgun_cdn/api"
 	"github.com/tundrawork/stargate/config"
 )
 
@@ -52,7 +52,7 @@ func GetBucket(ctx context.Context, c *app.RequestContext) {
 	}
 	matomo.ReportEvent(ctx, matomo.Event{
 		SiteID:     tenant.SiteID,
-		ActionName: "railgun-cdn:server:GetBucket",
+		ActionName: "railgun_cdn:server:GetBucket",
 		URL:        config.Conf.Services.RailgunCDN.CDN.Endpoint + tenantRequest.ObjectPath,
 		UserAgent:  string(c.UserAgent()),
 		ClientIP:   c.ClientIP(),
@@ -90,7 +90,7 @@ func HeadObject(ctx context.Context, c *app.RequestContext) {
 	}
 	matomo.ReportEvent(ctx, matomo.Event{
 		SiteID:     tenant.SiteID,
-		ActionName: "railgun-cdn:server:HeadObject",
+		ActionName: "railgun_cdn:server:HeadObject",
 		URL:        config.Conf.Services.RailgunCDN.CDN.Endpoint + tenantRequest.ObjectPath,
 		UserAgent:  string(c.UserAgent()),
 		ClientIP:   c.ClientIP(),
@@ -129,7 +129,7 @@ func PutObject(ctx context.Context, c *app.RequestContext) {
 	}
 	matomo.ReportEvent(ctx, matomo.Event{
 		SiteID:     tenant.SiteID,
-		ActionName: "railgun-cdn:server:PutObject",
+		ActionName: "railgun_cdn:server:PutObject",
 		URL:        config.Conf.Services.RailgunCDN.CDN.Endpoint + tenantRequest.ObjectPath,
 		UserAgent:  string(c.UserAgent()),
 		ClientIP:   c.ClientIP(),
@@ -166,7 +166,7 @@ func DeleteObject(ctx context.Context, c *app.RequestContext) {
 	}
 	matomo.ReportEvent(ctx, matomo.Event{
 		SiteID:     tenant.SiteID,
-		ActionName: "railgun-cdn:server:DeleteObject",
+		ActionName: "railgun_cdn:server:DeleteObject",
 		URL:        config.Conf.Services.RailgunCDN.CDN.Endpoint + tenantRequest.ObjectPath,
 		UserAgent:  string(c.UserAgent()),
 		ClientIP:   c.ClientIP(),
@@ -200,7 +200,7 @@ func GetURL(ctx context.Context, c *app.RequestContext) {
 	}
 	matomo.ReportEvent(ctx, matomo.Event{
 		SiteID:     tenant.SiteID,
-		ActionName: "railgun-cdn:server:GetURL",
+		ActionName: "railgun_cdn:server:GetURL",
 		URL:        config.Conf.Services.RailgunCDN.CDN.Endpoint + tenantRequest.ObjectPath,
 		UserAgent:  string(c.UserAgent()),
 		ClientIP:   c.ClientIP(),
@@ -238,7 +238,7 @@ func ClientGateway(ctx context.Context, c *app.RequestContext) {
 	hlog.CtxInfof(ctx, "[RailgunCDN][Request] Method=%s URI=%s", "ClientGateway", objectPath)
 	matomo.ReportEvent(ctx, matomo.Event{
 		SiteID:     siteId,
-		ActionName: "railgun-cdn:client:Gateway",
+		ActionName: "railgun_cdn:client:Gateway",
 		URL:        config.Conf.Services.RailgunCDN.CDN.Endpoint + objectPath,
 		UserAgent:  string(c.UserAgent()),
 		ClientIP:   c.ClientIP(),

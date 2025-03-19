@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/tundrawork/stargate/app/railgun-cdn/api"
+	"github.com/tundrawork/stargate/app/railgun_cdn/api"
 	"github.com/tundrawork/stargate/config"
 )
 

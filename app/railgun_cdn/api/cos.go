@@ -38,6 +38,7 @@ var (
 )
 
 // InitCosClient initializes the COS client.
+// It should be called once, typically during application startup.
 func InitCosClient(bucket, region, secretID, secretKey string) {
 	bucketURLRaw := "https://" + bucket + ".cos." + region + ".myqcloud.com"
 	bucketURL, err := url.Parse(bucketURLRaw)
