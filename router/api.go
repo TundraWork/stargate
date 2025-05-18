@@ -21,4 +21,5 @@ func apiRouteRegister(r *server.Hertz) {
 	railgun_.DELETE("/object", railgun_cdn.DeleteObject)
 	railgun_.GET("/url", railgun_cdn.GetURL)
 	railgun_.GET("/gateway", railgun_cdn.ClientGateway)
+	railgun_.HEAD("/gateway", railgun_cdn.ClientGateway)
 }
